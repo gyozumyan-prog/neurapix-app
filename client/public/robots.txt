@@ -1,0 +1,19 @@
+# NeuraPix - AI Photo Editor
+# https://neurapix.replit.app
+
+User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /examples
+Allow: /generate
+
+Disallow: /api/
+Disallow: /editor/
+Disallow: /manual-editor/
+Disallow: /account
+
+# Sitemap
+Sitemap: https://neurapix.replit.app/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

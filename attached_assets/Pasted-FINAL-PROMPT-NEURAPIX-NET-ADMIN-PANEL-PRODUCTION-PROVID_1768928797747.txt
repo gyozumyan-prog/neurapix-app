@@ -1,0 +1,286 @@
+FINAL PROMPT — NEURAPIX.NET ADMIN PANEL (PRODUCTION, PROVIDER-AGNOSTIC)
+0. CONTEXT
+
+Project: neurapix.net
+Type: SaaS image processing platform (enhance, upscale, HDR, face restore, etc).
+
+GOAL:
+Build a FULLY AUTONOMOUS ADMIN PANEL that allows the owner to:
+
+add / remove AI functions
+
+switch AI providers (Replicate ↔ RunPod ↔ Local) WITHOUT CODE CHANGES
+
+manage users, payments, pricing, limits
+
+manage site content (CMS)
+
+manage infrastructure configs
+
+migrate to any server and work without Replit AI forever
+
+If any of the above requires code edits — the task is FAILED.
+
+1. TECH STACK (MANDATORY)
+Frontend (Admin Panel)
+
+Next.js 14 (App Router)
+
+TypeScript
+
+TailwindCSS
+
+shadcn/ui
+
+Protected route: /admin
+
+JWT auth
+
+RBAC: admin | support | viewer
+
+Backend
+
+Node.js (NestJS or Express)
+
+PostgreSQL
+
+Prisma ORM
+
+Redis
+
+BullMQ
+
+REST API only
+
+2. ABSOLUTE RULES (NON-NEGOTIABLE)
+
+❌ No hardcoded providers
+❌ No if (replicate) in business logic
+❌ No API keys in code
+❌ No provider-specific logic in controllers
+
+✅ Everything configurable from admin panel
+✅ Provider selection ONLY from DB
+✅ One interface for all providers
+✅ Zero redeploy to change provider, model, price, limits
+
+3. PROVIDER-AGNOSTIC ARCHITECTURE (CRITICAL)
+3.1 Provider Interface (MANDATORY)
+interface AIProvider {
+  processImage(
+    input: File,
+    config: ProviderConfig
+  ): Promise<ProcessResult>
+}
+
+3.2 Provider Implementations
+/providers
+  replicate.provider.ts
+  runpod.provider.ts
+  local.provider.ts
+
+
+Each provider MUST:
+
+implement AIProvider
+
+accept config ONLY from DB
+
+have no hardcoded keys or endpoints
+
+3.3 Provider Factory (MANDATORY)
+const provider = ProviderFactory.get(fn.provider)
+await provider.processImage(file, fn.config)
+
+3.4 Provider Config (stored in DB as JSON)
+{
+  "provider": "runpod",
+  "endpoint": "https://api.runpod.ai/v2/xxx/run",
+  "model": "esrgan",
+  "timeout": 300,
+  "retries": 2,
+  "params": {
+    "scale": 4,
+    "face_enhance": true
+  }
+}
+
+3.5 ADMIN PANEL MUST ALLOW
+
+provider selector (dropdown)
+
+JSON config editor (validated)
+
+Test provider button
+
+Enable / Disable provider
+
+Retry / timeout config
+
+4. AI FUNCTIONS (DATA-DRIVEN)
+CRUD AI Functions
+
+Fields:
+
+key (enhance, upscale, hdr)
+
+name
+
+description
+
+price_per_use
+
+enabled
+
+provider
+
+provider_config (JSON)
+
+max_file_size
+
+allowed_formats
+
+priority
+
+daily_limit
+
+❗ If a function is removed from DB — it MUST disappear from the site.
+
+5. JOB QUEUE
+
+BullMQ
+
+Job statuses:
+queued | processing | done | failed
+
+Retry / cancel
+
+Logs per job
+
+Linked to user and function
+
+6. USERS
+
+List users
+
+Email
+
+Balance (credits)
+
+Usage history
+
+Manual credit add/remove
+
+Ban / Unban
+
+7. PAYMENTS
+
+Payment history
+
+Status
+
+Provider (Stripe / PayPal / Manual)
+
+Webhook handling
+
+Linked to user
+
+8. PLANS / PRICING
+
+CRUD plans
+
+Limits
+
+Prices
+
+Hidden plans (B2B)
+
+Assign plan to user
+
+9. CMS (SITE CONTENT)
+
+CRUD pages
+
+Fields:
+slug, title, html_content, seo_title, seo_description, is_published
+
+WYSIWYG + raw HTML
+
+Multilingual (JSON-based)
+
+10. CONFIG / ENV MANAGEMENT
+
+Editable from admin:
+
+API keys
+
+Provider endpoints
+
+S3 / CDN configs
+
+Feature flags
+
+❗ No redeploy allowed for config changes.
+
+11. ANALYTICS
+
+Revenue (day / month)
+
+Function usage
+
+Errors
+
+Avg processing time
+
+12. SECURITY
+
+RBAC
+
+Audit log (who changed what)
+
+2FA ready
+
+IP whitelist
+
+13. EXPORT / BACKUP
+
+Export users
+
+Export payments
+
+Export logs
+
+DB backup
+
+14. DELIVERY REQUIREMENTS
+
+Production-ready code
+
+Clear folder structure
+
+Comments
+
+.env.example
+
+No mocks
+
+No TODOs
+
+15. FINAL ACCEPTANCE RULE
+
+If the admin panel does NOT allow switching Replicate → RunPod → Local
+without changing code or redeploying, the task is REJECTED.
+
+🎯 RESULT
+
+Owner can:
+
+add/remove AI functions
+
+switch providers freely
+
+manage site, users, payments
+
+migrate to any server
+
+never use Replit AI again
