@@ -1,6 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-// import { serveStatic } from "./static"; // временно отключено
 import { createServer } from "http";
 
 const app = express();
@@ -68,13 +67,8 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
   });
 
-  // ❌ ВРЕМЕННО НЕ СЕРВИМ СТАТИКУ (чтобы Render не падал)
-  if (false) {
-    // serveStatic(app);
-  } else {
-    const { setupVite } = await import("./vite");
-    await setupVite(httpServer, app);
-  }
+  // ⛔ фронт и vite ВРЕМЕННО ВЫКИНУТЫ
+  // нужен только живой backend для успешного деплоя
 
   const port = parseInt(process.env.PORT || "5000", 10);
   httpServer.listen(
